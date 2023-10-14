@@ -1,0 +1,14 @@
+name: cargo_cache
+description: Enable caching cargo related directories
+runs:
+  using: composite
+  steps:
+    - name: Cache cargo registry
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/git
+          ~/.cargo/registry
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}

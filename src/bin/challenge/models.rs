@@ -7,6 +7,16 @@ pub(crate) struct ChallengeRequest {
     pub challenge: String,
 }
 
+impl From<serde_json::Value> for ChallengeRequest {
+    fn from(value: serde_json::Value) -> Self {
+        ChallengeRequest {
+            token: value["token"].to_string(),
+            r#type: value["type"].to_string(),
+            challenge: value["challenge"].to_string(),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub(crate) struct SuccessResponse {
     pub challenge: String,

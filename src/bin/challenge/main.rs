@@ -25,10 +25,11 @@ pub(crate) async fn handler(request: Request) -> Result<Response<Body>, FailureR
         Body::Text(text) => serde_json::from_str(text).unwrap_or(serde_json::Value::Null),
         _ => serde_json::Value::Null,
     };
+    let challenge = ChallengeRequest::from(req);
 
     match env::var("SLACK_VERIFICATION_TOKEN") {
         Ok(token) => {
-            if req["token"].to_string() != token {
+            if challenge.token != token {
                 tracing::warn!("Authentication failed: Invalid token");
                 let res = FailureResponse {
                     body: "Invalid token".to_string(),
@@ -45,46 +46,13 @@ pub(crate) async fn handler(request: Request) -> Result<Response<Body>, FailureR
         }
     }
 
-    let type_ = req["type"].as_str();
-    match type_ {
-        Some("url_verification") => {
-            // Do nothing
-        }
-        Some(_) => {
-            tracing::info!("challenge failed: type is not url_verification");
-            let res = FailureResponse {
-                body: "type is not url_verification".to_string(),
-            };
-            return Err(res);
-        }
-        None => {
-            tracing::info!("challenge failed: type is not found");
-            let res = FailureResponse {
-                body: "type is not found".to_string(),
-            };
-            return Err(res);
-        }
-    }
-
-    let challenge = req["challenge"].as_str();
-    match challenge {
-        Some(challenge) => {
-            tracing::info!("challenge success");
-            let body = json!(SuccessResponse {
-                challenge: challenge.to_string(),
-            });
-            let res = Builder::new()
-                .status(StatusCode::OK)
-                .body(Body::Text(body.to_string()))
-                .unwrap();
-            Ok(res)
-        }
-        None => {
-            tracing::info!("challenge failed: challenge is not found");
-            let res = FailureResponse {
-                body: "challenge is not found".to_string(),
-            };
-            Err(res)
-        }
-    }
+    tracing::info!("challenge success");
+    let body = json!(SuccessResponse {
+        challenge: challenge.challenge,
+    });
+    let res = Builder::new()
+        .status(StatusCode::OK)
+        .body(Body::Text(body.to_string()))
+        .unwrap();
+    Ok(res)
 }
