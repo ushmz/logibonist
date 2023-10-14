@@ -40,6 +40,7 @@ async fn main() -> Result<(), Error> {
 
 pub(crate) async fn handler(req: Request) -> Result<Response<Body>, Error> {
     let req: Task = Task::try_from(req)?;
+    tracing::debug!("{:?}", req);
 
     let res = Builder::new()
         .status(StatusCode::CREATED)

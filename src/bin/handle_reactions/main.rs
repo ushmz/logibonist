@@ -21,13 +21,11 @@ async fn handler(request: Request) -> Result<Response<Body>, Error> {
         Body::Text(text) => serde_json::from_str(text).unwrap_or(serde_json::Value::Null),
         _ => serde_json::Value::Null,
     };
-
-    print!("{:?}", req);
+    tracing::debug!("{:?}", req);
 
     let res = Builder::new()
         .status(StatusCode::ACCEPTED)
         .body(Body::Empty)
         .unwrap();
-
     Ok(res)
 }
