@@ -1,0 +1,72 @@
+name: Notify deployment result to slack
+on:
+  workflow_run:
+    workflows: [deploy]
+    types: [completed]
+jobs:
+  on-success:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Notify deploy success
+        uses: slackapi/slack-github-action@v1.24.0
+        if:
+        with:
+          payload: |
+            {
+              "text": ":ok_woman: デプロイに成功しました",
+              "attachments": [
+                {
+                  "color": "good",
+                  "mrkdwn_in": ["fields"],
+                  "fields": [
+                    {
+                      "title": "Deployment",
+                      "value": "${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
+                      "short": false,
+                    },
+                    {
+                      "title": "Author",
+                      "value": "<https://github.com/${{ github.event.sender.login }}|@${{ github.event.sender.login }}>",
+                      "short": false,
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+          SLACK_WEBHOOK_URL: ${{ secrets.LOGIBONIST_WEBHOOK_URL }}
+  on-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - name: Notify deploy failure
+        uses: slackapi/slack-github-action@v1.24.0
+        if:
+        with:
+          payload: |
+            {
+              "text": ":no_good: デプロイに失敗しました",
+              "attachments": [
+                {
+                  "color": "danger",
+                  "mrkdwn_in": ["fields"],
+                  "fields": [
+                    {
+                      "title": "Deployment",
+                      "value": "${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
+                      "short": false,
+                    },
+                    {
+                      "title": "Author",
+                      "value": "<https://github.com/${{ github.event.sender.login }}|@${{ github.event.sender.login }}>",
+                      "short": false,
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+          SLACK_WEBHOOK_URL: ${{ secrets.LOGIBONIST_WEBHOOK_URL }}
