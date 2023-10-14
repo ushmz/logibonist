@@ -24,16 +24,7 @@ async fn post(endpoint: &str, body: String) -> Result<reqwest::Response, reqwest
     client.post(endpoint).body(body).send().await
 }
 
-#[derive(Debug, Serialize)]
-pub struct PostMessageArguments {
-    channel: String,
-    // used as a fallback string of notifications
-    text: Option<String>,
-    blocks: Vec<String>,
-    thread_ts: Option<String>,
-}
-
-async fn post_message(arg: PostMessageArguments) -> Result<reqwest::Response, reqwest::Error> {
+pub async fn post_message<T: Serialize>(arg: &T) -> Result<reqwest::Response, reqwest::Error> {
     let body = json!(arg);
     post("https://slack.com/api/chat.postMessage", body.to_string()).await
 }

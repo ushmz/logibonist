@@ -1,3 +1,5 @@
+mod client;
+mod model;
 use lambda_http::{
     http::{response::Builder, StatusCode},
     service_fn, Body, Error, Request, Response,
