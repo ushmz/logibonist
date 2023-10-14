@@ -1,4 +1,3 @@
-use lambda_http::Body;
 use reqwest::header;
 use serde::Serialize;
 use serde_json::json;

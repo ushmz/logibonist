@@ -3,6 +3,7 @@ use lambda_http::{
     service_fn, Body, Error, Request, Response,
 };
 use serde::Deserialize;
+use std::convert::TryFrom;
 
 #[derive(Deserialize, Debug)]
 struct Task {
@@ -38,9 +39,12 @@ async fn main() -> Result<(), Error> {
 }
 
 pub(crate) async fn handler(req: Request) -> Result<Response<Body>, Error> {
-    let req: Task = req.try_into()?;
-    print!("{:?}", req);
-    let res = Builder::new().status(StatusCode::CREATED).body(Body::Empty).unwrap();
+    let req: Task = Task::try_from(req)?;
+
+    let res = Builder::new()
+        .status(StatusCode::CREATED)
+        .body(Body::Empty)
+        .unwrap();
 
     Ok(res)
 }
