@@ -5,7 +5,7 @@ on:
 jobs:
   fmt:
     runs-on: ubuntu-latest
-    needs: build_cache
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - run: rustup component add rustfmt
@@ -13,7 +13,7 @@ jobs:
       - run: cargo fmt --all -- --check
   clippy:
     runs-on: ubuntu-latest
-    needs: build_cache
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - run: rustup component add clippy
@@ -21,16 +21,16 @@ jobs:
       - run: cargo clippy --all-targets --all-features
   test:
     runs-on: ubuntu-latest
-    needs: build_cache
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/cargo_cache
       - run: cargo test --all -- --nocapture
   build:
     runs-on: ubuntu-latest
-    timeout_minutes: 10
-    env:
-    # CARGO_INCREMENTAL: 1
+    timeout-minutes: 5
+    # env:
+    #   CARGO_INCREMENTAL: 1
     steps:
       - uses: actions/checkout@v4
         # If you'd like to restore mtime, you have to disable shallow clone
