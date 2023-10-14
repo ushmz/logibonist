@@ -28,18 +28,17 @@ async fn handler(request: Request) -> Result<Response<Body>, Error> {
     };
     tracing::debug!("{:?}", req);
 
-    let arg = PostMessageArguments::new()
-        .channel(req["channel"].to_string())
-        .text(req["text"].to_string())
-        .blocks(
-            req["blocks"]
-                .as_array()
-                .unwrap()
-                .iter()
-                .map(|x| x.to_string())
-                .collect(),
-        )
-        .thread_ts(req["thread_ts"].to_string());
+    let arg = PostMessageArguments::create(
+        req["channel"].to_string(),
+        req["text"].to_string(),
+        req["blocks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|x| x.to_string())
+            .collect(),
+        Some(req["thread_ts"].to_string()),
+    );
 
     let api_res = post_message(&arg).await;
     match api_res {
