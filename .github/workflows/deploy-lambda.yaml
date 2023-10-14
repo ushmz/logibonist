@@ -10,11 +10,11 @@ jobs:
     env:
     # CARGO_INCREMENTAL: 1
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         # If you'd like to restore mtime, you have to disable shallow clone
         # with:
         #   fetch-depth: 0
+      - uses: ./.github/actions/cargo_cache
       # If you'd like to enable incremental build,
       # you have to restore mtime for code.
       # @see https://github.com/MestreLion/git-tools/blob/main/git-restore-mtime
@@ -22,16 +22,8 @@ jobs:
       #   uses: actions/setup-python@v2
       # - name: Restore mtime
       #   run: python ./path/to/git-restore-mtime.py
-      - name: Build
-        run: echo "build"
-      - name: Enable cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/git
-            ~/.cargo/registry
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: build
+        run: cargo build
   # deploy:
   #   runs-on: ubuntu-latest
   #   timeout_minutes: 10
